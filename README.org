@@ -1,28 +1,29 @@
-# md-readme.el --- Markdown-formatted READMEs for your ELisp
+* h2o --- Orgmode-formatted READMEs for your ELisp
 
 Copyright (C) 2009 Thomas Kappler
+Copyright (C) 2011 Puneeth Chaganti
 
-* Author: Thomas Kappler <tkappler@gmail.com>
-* Created: 2009 November 07
-* Keywords: lisp, help, readme, markdown, header, documentation, github
-* URL: <http://github.com/thomas11/md-readme/tree/master>
+  - Author: Thomas Kappler <tkappler@gmail.com>
+  - Created: 2009 November 07
+  - Keywords: lisp, help, readme, orgmode, header, documentation, github
+  - URL: <http://github.com/punchagan/h2o/tree/master>
 
 This file is not part of GNU Emacs.
 
-Licensed under the [GPL version 3](http://www.gnu.org/licenses/) or later.
+Licensed under the [[http://www.gnu.org/licenses/][GPL version 3]] or later.
 
-# Commentary
+* Commentary
 
 The git-based source code hosting site <http://github.com> has
 lately become popular for Emacs Lisp projects. Github has a feature
 that displays files named "README[.suffix]" automatically on a
-project's main page. If these files are formatted in Markdown, the
+project's main page. If these files are formatted in Orgmode, the
 formatting is interpreted. See
 <http://github.com/guides/readme-formatting> for more information.
 
 Emacs Lisp files customarily have a header in a fairly standardized
-format. md-readme extracts this header, re-formats it to Markdown,
-and writes it to the file "README.md" in the same directory. If you
+format. h2o extracts this header, re-formats it to Orgmode,
+and writes it to the file "README.org" in the same directory. If you
 put your code on github, you could have this run automatically, for
 instance upon saving the file or from a git pre-commit hook, so you
 always have an up-to-date README on github.
@@ -33,25 +34,29 @@ website, lists, and normal paragraphs. Lists are somewhat tricky to
 recognize automatically, and the program employs a very simple
 heuristic currently.
 
-# Dependencies
+* Dependencies
 None.
 
-# Installation
-(require 'md-readme), then you can call mdr-generate manually. I
+* Installation
+(require 'h2o), then you can call h2o-generate manually. I
 have not found a way to call it automatically that I really like,
 but here is one that works for me:
 
-    (require 'md-readme)
+    (require 'h2o)
     (dir-locals-set-class-variables
-     'generate-README-with-md-readme
-     '((emacs-lisp-mode . ((mdr-generate-readme . t)))))
-    (dolist (dir '("~/Projects/wpmail/" "~/Projects/md-readme/"))
+     'generate-README-with-h2o
+     '((emacs-lisp-mode . ((h2o-generate-readme . t)))))
+    (dolist (dir '("~/Projects/wpmail/" "~/Projects/h2o/"))
       (dir-locals-set-directory-class
-       dir 'generate-README-with-md-readme))
+       dir 'generate-README-with-h2o))
     (add-hook 'after-save-hook 
-              '(lambda () (if (boundp 'mdr-generate-readme) (mdr-generate))))
+              '(lambda () (if (boundp 'h2o-generate-readme) (h2o-generate))))
 
-# History
-* 2009-11:    First release.
+* History
+2009-11:    First release.
+2011-03:    Forked for Orgmode.
+
+* To Do
+  - Fix codeblock rendering
 
 

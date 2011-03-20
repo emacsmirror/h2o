@@ -5,8 +5,8 @@ EMACS       = emacs
 # load-path, but allows you to pass LOAD_PATH to make. In our case, a
 # simple "make LOAD_PATH=." should do the trick.
 
-README.md: md-readme.el
+README.org: h2o.el
 	@$(EMACS) -q --no-site-file -batch \
 		-eval "(mapc (lambda (dir) (add-to-list 'load-path dir)) (parse-colon-path (getenv \"LOAD_PATH\")))" \
-		-l md-readme \
-		-f mdr-generate-batch $< $@
+		-l h2o \
+		-f h2o-generate-batch $< $@

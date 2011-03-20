@@ -1,11 +1,12 @@
-;;; md-readme.el --- Markdown-formatted READMEs for your ELisp
+;;; h2o.el --- Orgmode-formatted READMEs for your ELisp
 
 ;; Copyright (C) 2009 Thomas Kappler
+;; Copyright (C) 2011 Puneeth Chaganti
 
 ;; Author: Thomas Kappler <tkappler@gmail.com>
 ;; Created: 2009 November 07
-;; Keywords: lisp, help, readme, markdown, header, documentation, github
-;; URL: <http://github.com/thomas11/md-readme/tree/master>
+;; Keywords: lisp, help, readme, orgmode, header, documentation, github
+;; URL: <http://github.com/punchagan/h2o/tree/master>
 
 ;; This file is not part of GNU Emacs.
 
@@ -27,13 +28,13 @@
 ;; The git-based source code hosting site <http://github.com> has
 ;; lately become popular for Emacs Lisp projects. Github has a feature
 ;; that displays files named "README[.suffix]" automatically on a
-;; project's main page. If these files are formatted in Markdown, the
+;; project's main page. If these files are formatted in Orgmode, the
 ;; formatting is interpreted. See
 ;; <http://github.com/guides/readme-formatting> for more information.
 
 ;; Emacs Lisp files customarily have a header in a fairly standardized
-;; format. md-readme extracts this header, re-formats it to Markdown,
-;; and writes it to the file "README.md" in the same directory. If you
+;; format. h2o extracts this header, re-formats it to Orgmode,
+;; and writes it to the file "README.org" in the same directory. If you
 ;; put your code on github, you could have this run automatically, for
 ;; instance upon saving the file or from a git pre-commit hook, so you
 ;; always have an up-to-date README on github.
@@ -48,72 +49,86 @@
 ;; None.
 
 ;;; Installation:
-;; (require 'md-readme), then you can call mdr-generate manually. I
+;; (require 'h2o), then you can call h2o-generate manually. I
 ;; have not found a way to call it automatically that I really like,
 ;; but here is one that works for me:
 
-;;     (require 'md-readme)
+;;     (require 'h2o)
 ;;     (dir-locals-set-class-variables
-;;      'generate-README-with-md-readme
-;;      '((emacs-lisp-mode . ((mdr-generate-readme . t)))))
-;;     (dolist (dir '("~/Projects/wpmail/" "~/Projects/md-readme/"))
+;;      'generate-README-with-h2o
+;;      '((emacs-lisp-mode . ((h2o-generate-readme . t)))))
+;;     (dolist (dir '("~/Projects/wpmail/" "~/Projects/h2o/"))
 ;;       (dir-locals-set-directory-class
-;;        dir 'generate-README-with-md-readme))
+;;        dir 'generate-README-with-h2o))
 ;;     (add-hook 'after-save-hook 
-;;               '(lambda () (if (boundp 'mdr-generate-readme) (mdr-generate))))
+;;               '(lambda () (if (boundp 'h2o-generate-readme) (h2o-generate))))
 
 ;;; History:
 ;; 2009-11:    First release.
+;; 2011-03:    Forked for Orgmode.
+
+;;; To Do:
+;;   - Fix codeblock rendering
 
 ;;; Code:
-(defun mdr-generate (&optional out-filename)
-  "Generate README.md from the header of the current file."
+(defun h2o-generate (&optional out-filename)
+  "Generate README.org from the header of the current file."
   (interactive)
-  (let ((header (mdr-extract-header)))
-    (with-temp-file (or out-filename "README.md")
+  (let ((header (h2o-extract-header)))
+    (with-temp-file (or out-filename "README.org")
       (insert header)
-      (mdr-convert-header))))
+      (h2o-convert-header))))
 
-(defun mdr-generate-batch ()
-  "Generate README.md from elisp files on the command line.
+(defun h2o-generate-batch ()
+  "Generate README.org from elisp files on the command line.
 Takes two command line arguments: the elisp filename, and the target
-Markdown filename (which defaults to 'README.md'."
+Orgmode filename (which defaults to 'README.org'."
   (let ((in-filename (expand-file-name (or (car command-line-args-left) "")))
-        (out-filename (expand-file-name (or (cadr command-line-args-left) "README.md"))))
+        (out-filename (expand-file-name (or (cadr command-line-args-left) "README.org"))))
     (message "Generating %s from %s..." out-filename in-filename)
     (with-current-buffer (find-file in-filename)
-      (mdr-generate out-filename))
+      (h2o-generate out-filename))
     (setq command-line-args-left (cddr command-line-args-left))))
 
-(defun mdr-convert-header ()
-  "Convert the header to Markdown.
+(defun h2o-convert-header ()
+  "Convert the header to Orgmode.
 This function transforms the header in-place, so be sure to
-extract the header first with mdr-extract-header and call it on
+extract the header first with h2o-extract-header and call it on
 the copy."
   (goto-char (point-min))
-  (mdr-find-and-replace-disclaimer)
+  (h2o-find-and-replace-gpl-disclaimer)
   (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
     (when (looking-at ";;")
       (delete-char 2)
-      (cond ((looking-at ";")  ; heading
+      (cond ((looking-at "; ")  ; heading 
 	     (delete-char 1)
 	     (if (looking-at " Code:?")
-		 (delete-region (point) (line-end-position))
-	       (insert "#")
+                 (delete-region (point) (line-end-position))
+	       (insert "*")
+               (when (search-forward ".el" (line-end-position) t)
+                 (replace-match ""))
 	       (progn
 		 (end-of-line)
 		 (backward-char)
 		 (when (looking-at ":")
 		   (delete-char 1)))))
-	    ((mdr-looking-at-list-p) (insert "*"))
-	    (t (delete-char 1)))) ; whitespace
+            ((looking-at " ---") ; sub-heading
+             (delete-region (point) (line-end-position))
+             (forward-line -1)
+             (insert "** "))
+	    ((h2o-looking-at-list-p) (insert "  -"))
+	    ((looking-at " ") (delete-char 1)) ; whitespace
+	    ((looking-at ";;;") ; divider
+             (delete-region (point) (line-end-position))
+             (insert "-----"))
+            (t ()))) ; empty-line
     (forward-line 1)))
 
-(defun mdr-extract-header ()
+(defun h2o-extract-header ()
   "Extract the standard ELisp file header into a string."
-  (buffer-substring (point-min) (mdr-end-of-header)))
+  (buffer-substring (point-min) (h2o-end-of-header)))
 
-(defun mdr-end-of-header ()
+(defun h2o-end-of-header ()
   "Find the end of the header and return its position."
   (save-excursion
     (goto-char (point-min))
@@ -121,23 +136,35 @@ the copy."
       (forward-line 1))
     (point)))
 
-(defun mdr-looking-at-list-p ()
+(defun h2o-looking-at-list-p ()
   "Determine if the line we're looking should become a list item.
 Requires point to be at the beginning of the line."
-  (looking-at " ?[-a-zA-Z0-9]+:"))  ; why does [:alnum:] not work?
+  (looking-at " ?[[:alnum:]]+:"))  
 
-(defun mdr-find-and-replace-disclaimer ()
+(defun h2o-find-and-replace-gpl-disclaimer ()
   "Find the GPL license disclaimer, and replace it with a
 one-line note linked to the GPL website."
   (save-excursion
     (goto-char (point-min))
-    (when (search-forward "This program is free software" nil t)
+    (when (re-search-forward ".* is free software" nil t)
       (let ((start-line (progn (beginning-of-line) (point)))
       	    (end-line (search-forward
       		       "If not, see <http://www.gnu.org/licenses/>."
-      		       nil t)))
+      		       nil t))
+            version later)
+        (goto-char start-line)
+        (save-excursion
+          (if (re-search-forward "\\(version [[:digit:]]\\)" end-line t)
+              (setq version (match-string 1)))
+          (if (re-search-forward "any later version" end-line t)
+              (setq later " or later.")
+            (setq later ".")))
       	(delete-region start-line end-line)
-      	(insert "Licensed under the [GPL version 3](http://www.gnu.org/licenses/) or later.")))))
+      	(insert "Licensed under the "
+                (format 
+                 "[[http://www.gnu.org/licenses/][GPL %s]]"
+                 version)
+                later)))))
 
-(provide 'md-readme)
-;;; md-readme.el ends here
+(provide 'h2o)
+;;; h2o.el ends here
