@@ -60,7 +60,7 @@
 ;;     (dolist (dir '("~/Projects/wpmail/" "~/Projects/h2o/"))
 ;;       (dir-locals-set-directory-class
 ;;        dir 'generate-README-with-h2o))
-;;     (add-hook 'after-save-hook 
+;;     (add-hook 'after-save-hook
 ;;               '(lambda () (if (boundp 'h2o-generate-readme) (h2o-generate))))
 
 ;;; History:
@@ -74,9 +74,11 @@
 (defun h2o-generate (&optional out-filename)
   "Generate README.org from the header of the current file."
   (interactive)
-  (let ((header (h2o-extract-header)))
+  (let ((header (h2o-extract-header))
+        (filename (file-name-nondirectory (buffer-file-name))))
     (with-temp-file (or out-filename "README.org")
       (insert header)
+      (insert (format "README.org generated from the library header in ~%s~ by [[https://github.com/punchagan/h2o][h2o]]" filename))
       (h2o-convert-header))))
 
 (defun h2o-generate-batch ()
@@ -100,7 +102,7 @@ the copy."
   (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
     (when (looking-at ";;")
       (delete-char 2)
-      (cond ((looking-at "; ")  ; heading 
+      (cond ((looking-at "; ")  ; heading
 	     (delete-char 1)
 	     (if (looking-at " Code:?")
                  (delete-region (point) (line-end-position))
@@ -139,7 +141,7 @@ the copy."
 (defun h2o-looking-at-list-p ()
   "Determine if the line we're looking should become a list item.
 Requires point to be at the beginning of the line."
-  (looking-at " ?[[:alnum:]]+:"))  
+  (looking-at " ?[[:alnum:]]+:"))
 
 (defun h2o-find-and-replace-gpl-disclaimer ()
   "Find the GPL license disclaimer, and replace it with a
@@ -161,7 +163,7 @@ one-line note linked to the GPL website."
             (setq later ".")))
       	(delete-region start-line end-line)
       	(insert "Licensed under the "
-                (format 
+                (format
                  "[[http://www.gnu.org/licenses/][GPL %s]]"
                  version)
                 later)))))

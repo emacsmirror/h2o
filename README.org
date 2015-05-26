@@ -49,7 +49,7 @@ but here is one that works for me:
     (dolist (dir '("~/Projects/wpmail/" "~/Projects/h2o/"))
       (dir-locals-set-directory-class
        dir 'generate-README-with-h2o))
-    (add-hook 'after-save-hook 
+    (add-hook 'after-save-hook
               '(lambda () (if (boundp 'h2o-generate-readme) (h2o-generate))))
 
 * History
@@ -60,3 +60,4 @@ but here is one that works for me:
   - Fix codeblock rendering
 
 
+README.org generated from the library header in h2o.el by [[https://github.com/punchagan/h2o][h2o]]
