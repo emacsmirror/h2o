@@ -100,6 +100,10 @@ the copy."
   (goto-char (point-min))
   (h2o-find-and-replace-gpl-disclaimer)
   (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
+    (when (= 1 (line-number-at-pos))
+      (when (re-search-forward "-\\*-.*-\\*-")
+        (replace-match ""))
+      (beginning-of-line))
     (when (looking-at ";;")
       (delete-char 2)
       (cond ((looking-at "; ")  ; heading
