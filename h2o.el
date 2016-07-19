@@ -118,10 +118,6 @@ the copy."
 		 (backward-char)
 		 (when (looking-at ":")
 		   (delete-char 1)))))
-            ((looking-at " ---") ; sub-heading
-             (delete-region (point) (line-end-position))
-             (forward-line -1)
-             (insert "** "))
 	    ((h2o-looking-at-list-p) (insert "  -"))
 	    ((looking-at " ") (delete-char 1)) ; whitespace
 	    ((looking-at ";;;") ; divider
