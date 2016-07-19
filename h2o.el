@@ -1,12 +1,12 @@
 ;;; h2o.el --- Orgmode-formatted READMEs for your ELisp
 
 ;; Copyright (C) 2009 Thomas Kappler
-;; Copyright (C) 2011 Puneeth Chaganti
+;; Copyright (C) 2011-2016 Puneeth Chaganti
 
-;; Author: Thomas Kappler <tkappler@gmail.com>
-;; Created: 2009 November 07
+;; Author: Puneeth Chaganti <punchagan@muse-amuse.in>
+;; Created: 2011 March 20
 ;; Keywords: lisp, help, readme, orgmode, header, documentation, github
-;; URL: <http://github.com/punchagan/h2o/tree/master>
+;; URL: <https://github.com/punchagan/h2o>
 
 ;; This file is not part of GNU Emacs.
 
