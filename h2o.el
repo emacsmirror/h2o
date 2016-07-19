@@ -150,7 +150,7 @@ the copy."
 (defun h2o-looking-at-list-p ()
   "Determine if the line we're looking should become a list item.
 Requires point to be at the beginning of the line."
-  (looking-at " ?[[:alnum:]]+:"))
+  (looking-at " ?[[:alnum:]-]+:"))
 
 (defun h2o-find-and-replace-gpl-disclaimer ()
   "Find the GPL license disclaimer, and replace it with a
