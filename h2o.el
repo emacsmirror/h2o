@@ -67,9 +67,6 @@
 ;; 2009-11:    First release.
 ;; 2011-03:    Forked for Orgmode.
 
-;;; To Do:
-;;   - Fix codeblock rendering
-
 ;;; Code:
 (defun h2o-generate (&optional out-filename)
   "Generate README.org from the header of the current file."
@@ -127,6 +124,7 @@ the copy."
 		 (when (looking-at ":")
 		   (delete-char 1)))))
 	    ((h2o-looking-at-list-p) (insert "  -"))
+            ((looking-at "    ") (h2o-format-code-block)) ; codeblock
 	    ((looking-at " ") (delete-char 1)) ; whitespace
 	    ((looking-at ";;;") ; divider
              (delete-region (point) (line-end-position))
@@ -138,6 +136,30 @@ the copy."
 (defun h2o-extract-header ()
   "Extract the standard ELisp file header into a string."
   (buffer-substring (point-min) (h2o-end-of-header)))
+
+(defun h2o-format-code-block ()
+  "Format the code block starting at point as an org src block."
+  (save-excursion
+    (insert ";;"))
+  (let* ((start (point))
+         (end (h2o-end-of-code-block))
+         (code (buffer-substring start end))
+         code*)
+    (with-temp-buffer
+      (insert (format "#+BEGIN_SRC emacs-lisp\n%s\n#+END_SRC\n\n" code))
+      (goto-char (point-min))
+      (while (search-forward ";;    " nil t)
+        (replace-match ""))
+      (setq code* (buffer-string)))
+    (delete-region start end)
+    (insert code*)))
+
+(defun h2o-end-of-code-block ()
+  "Find the end of the code-block and return its position."
+  (save-excursion
+    (while (or (looking-at ";;    ") (looking-at "\n"))
+      (forward-line 1))
+    (point)))
 
 (defun h2o-end-of-header ()
   "Find the end of the header and return its position."
