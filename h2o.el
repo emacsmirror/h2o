@@ -146,7 +146,7 @@ the copy."
          (code (buffer-substring start end))
          code*)
     (with-temp-buffer
-      (insert (format "#+BEGIN_SRC emacs-lisp\n%s\n#+END_SRC\n\n" code))
+      (insert (format "#+BEGIN_SRC emacs-lisp\n%s\n#+END_SRC\n" code))
       (goto-char (point-min))
       (while (search-forward ";;    " nil t)
         (replace-match ""))
@@ -159,6 +159,7 @@ the copy."
   (save-excursion
     (while (or (looking-at ";;    ") (looking-at "\n"))
       (forward-line 1))
+    (backward-char)
     (point)))
 
 (defun h2o-end-of-header ()
