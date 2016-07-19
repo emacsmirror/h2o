@@ -110,9 +110,16 @@ the copy."
 	     (delete-char 1)
 	     (if (looking-at " Code:?")
                  (delete-region (point) (line-end-position))
-	       (insert "*")
-               (when (search-forward ".el" (line-end-position) t)
-                 (replace-match ""))
+               (if (search-forward ".el" (line-end-position) t)
+                   ;; make title and subtitle
+                   (progn
+                     (replace-match "")
+                     (beginning-of-line)
+                     (insert "#+TITLE:")
+                     (when (search-forward " --- " (line-end-position) t)
+                       (replace-match "\n\n")))
+                 (beginning-of-line)
+                 (insert "*"))
 	       (progn
 		 (end-of-line)
 		 (backward-char)
