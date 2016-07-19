@@ -102,7 +102,7 @@ the copy."
   (h2o-find-and-replace-gpl-disclaimer)
   (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
     (when (= 1 (line-number-at-pos))
-      (when (re-search-forward "-\\*-.*-\\*-")
+      (when (re-search-forward "-\\*-.*-\\*-" (line-end-position) t)
         (replace-match ""))
       (beginning-of-line))
     (when (looking-at ";;")
