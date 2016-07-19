@@ -79,7 +79,8 @@
     (with-temp-file (or out-filename "README.org")
       (insert header)
       (insert (format "README.org generated from the library header in ~%s~ by [[https://github.com/punchagan/h2o][h2o]]\n" filename))
-      (h2o-convert-header))))
+      (h2o-convert-header)
+      (delete-trailing-whitespace))))
 
 (defun h2o-generate-batch ()
   "Generate README.org from elisp files on the command line.
