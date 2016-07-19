@@ -132,7 +132,8 @@ the copy."
              (delete-region (point) (line-end-position))
              (insert "-----"))
             (t ()))) ; empty-line
-    (forward-line 1)))
+    (forward-line 1))
+    (h2o-elisp-reference-to-org-verbatim))
 
 (defun h2o-extract-header ()
   "Extract the standard ELisp file header into a string."
@@ -175,6 +176,13 @@ one-line note linked to the GPL website."
                  "[[http://www.gnu.org/licenses/][GPL %s]]"
                  version)
                 later)))))
+
+(defun h2o-elisp-reference-to-org-verbatim ()
+  "Convert `...' to ~...~"
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "`\\(\\S-+\\)'" nil t)
+      (replace-match "~\\1~"))))
 
 (provide 'h2o)
 ;;; h2o.el ends here
